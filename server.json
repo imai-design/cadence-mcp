@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.imai-design/cadence-mcp",
+  "description": "ADHD and bipolar disorder daily-rhythm support MCP server. 23 tools, zero dependencies, Python 3.9 stdlib, stdio JSON-RPC.",
+  "version": "0.2.0",
+  "repository": {
+    "url": "https://github.com/imai-design/cadence-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "cadence-mcp",
+      "version": "0.2.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

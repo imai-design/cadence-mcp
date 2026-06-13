@@ -1,0 +1,28 @@
+name: cadence-mcp
+description: >
+  ADHD and bipolar disorder daily-rhythm support MCP server.
+  23 tools covering daily check-in, social rhythm (IPSRT), task breakdown,
+  focus timer, crisis bridge, and a care-facility mode for support plans.
+  Zero dependencies — Python 3.9 stdlib only.
+
+startCommand:
+  type: stdio
+  commandFunction: |-
+    (config) => ({
+      command: 'python3',
+      args: ['run.py'],
+      env: config.vaultRoot
+        ? { CADENCE_VAULT_ROOT: config.vaultRoot }
+        : {}
+    })
+
+configSchema:
+  type: object
+  properties:
+    vaultRoot:
+      type: string
+      description: >
+        Optional. Absolute path to an Obsidian (or any Markdown) vault.
+        When set, mood logs are appended to YYYY-MM-DD.md files under this root.
+        Leave empty to keep data local-only.
+  required: []

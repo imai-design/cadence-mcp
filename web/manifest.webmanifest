@@ -1,0 +1,18 @@
+{
+  "name": "Cadence Now",
+  "short_name": "Cadence",
+  "description": "気分の波と実行機能を、次の小さな一歩から支えるローカルアプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f1e8",
+  "theme_color": "#162820",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

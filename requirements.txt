@@ -1,0 +1,5 @@
+# Cadence は追加の依存パッケージなしで動きます。
+# 標準ライブラリのみ（Python 3.9 以上）。
+#
+# MCP プロトコルは stdlib の json / sys（stdio）で実装しているため、
+# `pip install mcp` などは不要です。

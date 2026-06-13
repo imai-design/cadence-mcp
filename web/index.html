@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#162820">
+  <meta name="description" content="ADHDと気分の波がある日の、次の一歩を小さくするローカルアプリ">
+  <title>Cadence Now</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar shell">
+    <a class="brand" href="/" aria-label="Cadence Now ホーム">
+      <span class="brand-mark" aria-hidden="true">C</span>
+      <span><strong>Cadence</strong><small>NOW</small></span>
+    </a>
+    <button class="support-button" id="support-open" type="button">
+      <span aria-hidden="true">＋</span> つながる
+    </button>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow" id="today-label">今日</p>
+      <h1>いまの自分に、<br><em>ちょうどいい一歩。</em></h1>
+      <p class="hero-copy">全部を整えなくていい。記録するか、ひとつ進めるか、休む準備をするか。</p>
+    </section>
+
+    <section class="one-thing card dark-card" aria-labelledby="one-title">
+      <div class="card-heading">
+        <div>
+          <p class="label">NOW / 今はこれだけ</p>
+          <h2 id="one-title">まだ一歩は置かれていません</h2>
+        </div>
+        <span class="step-orbit" aria-hidden="true"><span></span></span>
+      </div>
+      <p class="one-copy" id="one-copy">浮かんだことを、小さな一歩として置けます。</p>
+      <div class="one-actions">
+        <button class="primary light" id="task-done" type="button" hidden>ここまでできた</button>
+        <button class="secondary on-dark" id="task-add-open" type="button">一歩を置く</button>
+      </div>
+      <form class="inline-form" id="task-form" hidden>
+        <label for="task-title">次に触る、小さな一歩</label>
+        <div class="inline-row">
+          <input id="task-title" name="title" maxlength="160" placeholder="例：封筒を机に出す" required>
+          <button class="primary light" type="submit">置く</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="grid two-columns">
+      <article class="card checkin-card">
+        <div class="card-heading">
+          <div>
+            <p class="label green">30秒チェックイン</p>
+            <h2>今日の波を置く</h2>
+          </div>
+          <span class="status-pill" id="checkin-status">まだ</span>
+        </div>
+        <form id="checkin-form">
+          <div class="range-block">
+            <div class="range-label">
+              <label for="mood">気分</label>
+              <output id="mood-output" for="mood">0</output>
+            </div>
+            <input type="range" id="mood" name="mood" min="-5" max="5" value="0">
+            <div class="range-ends"><span>つらい</span><span>上がり気味</span></div>
+          </div>
+          <div class="compact-fields">
+            <label>睡眠
+              <span><input type="number" id="sleep-hours" min="0" max="24" step="0.5" inputmode="decimal" placeholder="--"> 時間</span>
+            </label>
+            <label>エネルギー
+              <span><input type="number" id="energy" min="0" max="5" step="1" inputmode="numeric" placeholder="--"> / 5</span>
+            </label>
+          </div>
+          <label class="meds-row">
+            <input type="checkbox" id="meds-taken">
+            <span class="fake-check" aria-hidden="true"></span>
+            今日は服薬した
+          </label>
+          <label class="note-field" for="note">一言だけでも、空でも
+            <textarea id="note" maxlength="1000" rows="2" placeholder="いま気になっていること"></textarea>
+          </label>
+          <button class="primary full" type="submit">今日を記録する</button>
+        </form>
+      </article>
+
+      <article class="card focus-card">
+        <div class="card-heading">
+          <div>
+            <p class="label ochre">TIMEBOX</p>
+            <h2>終わらせず、触る</h2>
+          </div>
+          <span class="tiny-clock" aria-hidden="true"></span>
+        </div>
+        <div class="timer" id="timer">05:00</div>
+        <p class="timer-copy" id="timer-copy">5分後にやめてもいい時間を作ります。</p>
+        <div class="duration-pills" id="duration-pills">
+          <button class="active" type="button" data-minutes="5">5分</button>
+          <button type="button" data-minutes="15">15分</button>
+          <button type="button" data-minutes="25">25分</button>
+        </div>
+        <button class="primary full" id="focus-toggle" type="button">5分だけ始める</button>
+      </article>
+    </section>
+
+    <section class="card rhythm-card">
+      <div class="card-heading">
+        <div>
+          <p class="label violet">生活のアンカー</p>
+          <h2>覚えている時刻だけ</h2>
+        </div>
+        <p class="soft-copy">空欄があっても大丈夫</p>
+      </div>
+      <form id="rhythm-form" class="rhythm-form">
+        <label><span class="anchor-icon sun" aria-hidden="true"></span><strong>起きた</strong><input type="time" name="wake"></label>
+        <label><span class="anchor-icon play" aria-hidden="true"></span><strong>活動開始</strong><input type="time" name="activity_start"></label>
+        <label><span class="anchor-icon meal" aria-hidden="true"></span><strong>夕食</strong><input type="time" name="dinner"></label>
+        <label><span class="anchor-icon moon" aria-hidden="true"></span><strong>寝る予定</strong><input type="time" name="bed"></label>
+        <button class="secondary" type="submit">時刻を残す</button>
+      </form>
+    </section>
+
+    <section class="grid two-columns lower-grid">
+      <article class="card">
+        <div class="card-heading">
+          <div>
+            <p class="label blue">LAST 7 DAYS</p>
+            <h2>波は、波のままで見る</h2>
+          </div>
+          <span class="status-pill pale" id="checkin-count">0日</span>
+        </div>
+        <div class="mood-chart" id="mood-chart">
+          <p class="empty">記録がたまると、ここに7日分の波が見えます。</p>
+        </div>
+      </article>
+      <article class="card notice-card">
+        <div class="card-heading">
+          <div>
+            <p class="label coral">小さな気づき</p>
+            <h2>責めずに、早めに</h2>
+          </div>
+        </div>
+        <div id="notices">
+          <p class="empty">今は特別な気づきはありません。</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid two-columns lower-grid landing-grid">
+      <article class="card landing-card" aria-labelledby="landing-title">
+        <div class="card-heading">
+          <div>
+            <p class="label green">LANDING / 夜の着地</p>
+            <h2 id="landing-title">今夜を手放す</h2>
+          </div>
+          <span class="landing-status" id="landing-status-pill" aria-hidden="true"></span>
+        </div>
+        <p class="card-sub" id="landing-summary">思いつきを退避して、明日の入口を1つだけ置いておく。</p>
+
+        <div id="landing-open-state">
+          <div class="landing-section">
+            <p class="landing-label">思いつきの退避</p>
+            <p class="landing-meta" id="parked-count-label">今日の退避: 0件</p>
+            <form id="idea-form" class="landing-form">
+              <div class="landing-row">
+                <input id="idea-text" name="text" maxlength="500" placeholder="頭から出してしまう" aria-label="思いつきの内容">
+                <button class="primary" type="submit">退避</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="landing-section">
+            <p class="landing-label">明日の最初の一歩</p>
+            <p class="landing-meta" id="first-step-label">まだ予約なし</p>
+            <form id="first-step-form" class="landing-form">
+              <div class="landing-row">
+                <input id="first-step-text" name="step" maxlength="160" placeholder="30秒で着手できる小ささで" aria-label="明日の最初の一歩">
+                <button class="primary" type="submit">予約</button>
+              </div>
+            </form>
+          </div>
+
+          <button class="primary full wind-down-btn" id="wind-down-close" type="button">今日はここまで</button>
+        </div>
+
+        <div id="landing-closed-state" hidden>
+          <p class="landing-closed-msg">今日はここまで。おやすみなさい。</p>
+          <p class="landing-meta" id="landing-closed-detail"></p>
+        </div>
+      </article>
+
+      <article class="card low-battery-card" aria-labelledby="lb-title">
+        <div class="card-heading">
+          <div>
+            <p class="label ochre">LOW BATTERY</p>
+            <h2 id="lb-title">今日は維持だけで十分</h2>
+          </div>
+        </div>
+        <p class="card-sub">生活維持の選択肢を3つに絞ります。診断や評価はしません。</p>
+
+        <form id="low-battery-form">
+          <div class="lb-checks">
+            <label class="lb-check-row">
+              <input type="checkbox" id="lb-water" name="water">
+              <span class="fake-check" aria-hidden="true"></span>
+              水分を手の届く場所に置いた
+            </label>
+            <label class="lb-check-row">
+              <input type="checkbox" id="lb-food" name="food">
+              <span class="fake-check" aria-hidden="true"></span>
+              食べられるものを確保した
+            </label>
+            <label class="lb-check-row">
+              <input type="checkbox" id="lb-meds" name="meds_taken">
+              <span class="fake-check" aria-hidden="true"></span>
+              服薬状況を確認した
+            </label>
+          </div>
+          <label class="note-field lb-dont-do" for="lb-dont-do-text">今日やらないこと（任意）
+            <input type="text" id="lb-dont-do-text" maxlength="200" placeholder="例：返信しない、予定を入れない">
+          </label>
+          <button class="secondary full lb-submit" type="submit">記録する</button>
+        </form>
+        <div id="lb-choices" hidden>
+          <p class="landing-label" id="lb-choices-label"></p>
+        </div>
+      </article>
+    </section>
+
+    <p class="disclaimer" id="disclaimer"></p>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="support-dialog">
+    <div class="dialog-head">
+      <div>
+        <p class="label coral">一人で抱えなくていい</p>
+        <h2>いま誰かにつながる</h2>
+      </div>
+      <button class="icon-button" id="support-close" type="button" aria-label="閉じる">×</button>
+    </div>
+    <p>つらさが強いときは、このアプリより人につながることを優先してください。</p>
+    <div class="contacts" id="contacts"></div>
+    <p class="verified">相談先は公式情報をもとに確認しています。いま命の危険があるときは119へ。</p>
+  </dialog>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

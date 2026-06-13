@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+.env
+*.pyo
+
+# Personal data -- must not be committed
+cadence.db
+*.db
+exports/
+*.log
+web.log
+.vault_path
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Coverage / testing artifacts
+.coverage
+htmlcov/
+.pytest_cache/
