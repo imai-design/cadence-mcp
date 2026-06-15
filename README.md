@@ -1,6 +1,6 @@
 # Cadence MCP
 
-ADHD and bipolar disorder daily-rhythm support — 23 tools, zero dependencies, Python 3.9+.
+ADHD and bipolar disorder daily-rhythm support — 24 tools, zero dependencies, Python 3.9+.
 
 ADHD・双極性障害のための生活リズム支援 MCP サーバー。Claude に話しかけるだけで使えます。
 
@@ -114,7 +114,7 @@ Claude Code の設定に追加する場合:
 
 ---
 
-## ツール一覧（23ツール）
+## ツール一覧（24ツール）
 
 ### 個人向け
 
@@ -139,6 +139,7 @@ Claude Code の設定に追加する場合:
 | `reenter_stalled` | 止まった返信・請求・公開へ、完了ではなく再接続から戻る（Re-entry） |
 | `low_battery_mode` | 谷の日の生活維持を最大3択までに減らす（Low Battery） |
 | `money_fog` | お金の不安を3つの事実と今触る1項目へ分ける（Money Fog） |
+| `list_due_reminders` | いつもの起床・就寝アンカーから軽い声かけを最小限・任意で出す（リマインド） |
 
 ### 事業所向け（障害福祉）
 

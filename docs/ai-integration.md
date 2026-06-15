@@ -12,7 +12,7 @@ Use this when Claude Code or Claude Desktop should call Cadence as tools.
 claude mcp add cadence -- python3 /path/to/cadence-mcp/run.py
 ```
 
-The MCP server exposes 23 tools (12 core + 7 app-specific + 4 care-facility):
+The MCP server exposes 24 tools (12 core + 8 app-specific + 4 care-facility):
 
 - `choose_support_mode`
 - `log_daily_checkin`
@@ -33,6 +33,7 @@ The MCP server exposes 23 tools (12 core + 7 app-specific + 4 care-facility):
 - `reenter_stalled`
 - `low_battery_mode`
 - `money_fog`
+- `list_due_reminders`
 - `support_plan_intake`
 - `support_plan_list`
 - `support_plan_export_docx`
