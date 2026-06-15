@@ -12,4 +12,4 @@ route_to_crisis_support から繋がります。
 メンタル日記に置き、第三者に送りません。
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"

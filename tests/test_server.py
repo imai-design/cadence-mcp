@@ -26,7 +26,7 @@ class ServerTest(unittest.TestCase):
 
     def test_tools_list_exposes_all_tools(self):
         resp = server.handle({"jsonrpc": "2.0", "id": 2, "method": "tools/list"}, self.conn)
-        self.assertEqual(len(resp["result"]["tools"]), 23)
+        self.assertEqual(len(resp["result"]["tools"]), 24)
         for tool in resp["result"]["tools"]:
             self.assertIn("inputSchema", tool)
 

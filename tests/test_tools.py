@@ -79,7 +79,54 @@ class ToolsTest(unittest.TestCase):
 
     def test_registry_consistent(self):
         self.assertEqual(set(tools.TOOL_SPECS), set(tools.HANDLERS))
-        self.assertEqual(len(tools.TOOL_SPECS), 23)
+        self.assertEqual(len(tools.TOOL_SPECS), 24)
+
+    # ---- list_due_reminders（軽い声かけ）----
+
+    def _seed_rhythm(self, wake="07:00", bed="23:00", days=3):
+        """typical anchor 算出に必要な社会リズムを数日ぶん入れる。"""
+        for i in range(1, days + 1):
+            tools.log_social_rhythm(self.conn, {"date": f"2026-06-0{i}", "wake": wake, "bed": bed})
+
+    def test_reminders_morning_checkin_when_no_checkin_today(self):
+        # Arrange: いつもの起床 07:00、今日の記録はまだ無い
+        self._seed_rhythm()
+        # Act: 朝 07:30 として呼ぶ
+        out = tools.list_due_reminders(self.conn, {"now": "07:30"})
+        # Assert
+        kinds = {n["kind"] for n in out["nudges"]}
+        self.assertIn("morning_checkin", kinds)
+        self.assertNotIn("_copy_warnings", out)
+
+    def test_reminders_silent_after_checkin(self):
+        # Arrange: いつもの起床あり + 今日チェックイン済み
+        self._seed_rhythm()
+        tools.log_daily_checkin(self.conn, {"mood": 1})
+        # Act
+        out = tools.list_due_reminders(self.conn, {"now": "07:30"})
+        # Assert: 朝の声かけは出ない
+        self.assertNotIn("morning_checkin", {n["kind"] for n in out["nudges"]})
+
+    def test_reminders_evening_winddown_when_approaching_bed(self):
+        # Arrange: いつもの就寝 23:00
+        self._seed_rhythm()
+        # Act: 22:30（就寝90分以内）
+        out = tools.list_due_reminders(self.conn, {"now": "22:30"})
+        # Assert
+        self.assertIn("evening_winddown", {n["kind"] for n in out["nudges"]})
+
+    def test_reminders_empty_without_rhythm_history(self):
+        # Arrange: リズム記録なし（typical 時刻が出ない）
+        # Act
+        out = tools.list_due_reminders(self.conn, {"now": "07:30"})
+        # Assert: 根拠が無いので何も声かけしない（任意・最小限）
+        self.assertEqual(out["nudges"], [])
+        self.assertIn("特にお知らせはありません", out["text"])
+
+    def test_reminders_output_passes_copy_guard(self):
+        self._seed_rhythm()
+        out = tools.list_due_reminders(self.conn, {"now": "07:30"})
+        self.assertNotIn("_copy_warnings", out)
 
     def test_landing_parks_idea_and_writes_inbox(self):
         out = tools.park_idea(self.conn, {"text": "Landingの画面を作る", "context": "Cadence"})

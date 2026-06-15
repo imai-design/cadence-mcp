@@ -1,4 +1,4 @@
-"""Cadence の 19 ツール（ロジック層）。MCP には依存しない純粋な関数群。
+"""Cadence の 24 ツール（ロジック層）。MCP には依存しない純粋な関数群。
 
 各ツールは (conn, args) を受け取り、{"text": 利用者に伝える文, ...} を返す。
 server.py がこのレジストリを JSON-RPC(stdio) で公開する。知能（分割文の生成や
@@ -25,6 +25,17 @@ def _now_iso() -> str:
 
 def _now_hm() -> str:
     return datetime.now().strftime("%H:%M")
+
+
+def _now_min() -> int:
+    now = datetime.now()
+    return now.hour * 60 + now.minute
+
+
+def _min_to_hm(minutes: Optional[int]) -> Optional[str]:
+    if minutes is None:
+        return None
+    return f"{minutes // 60:02d}:{minutes % 60:02d}"
 
 
 def _today_ja() -> str:
@@ -761,6 +772,81 @@ def choose_support_mode(conn, args: Dict[str, Any]) -> Dict[str, Any]:
     )
 
 
+# ---- 24. リマインド: 軽い声かけ（任意・最小限） ----
+
+def list_due_reminders(conn, args: Dict[str, Any]) -> Dict[str, Any]:
+    """今の時刻と『いつもの起床・就寝アンカー』から、今あてはまる軽い声かけだけを返す。
+
+    朝の30秒チェックイン・予約済みの最初の一歩・夜の着地を、根拠があるときだけ差し出す。
+    早期警告は1件に集約。ストリーク・未達日数は数えない。すべて任意。
+    （希死念慮など本物の危機はここでは扱わず、各記録ツールが検知時に安全ハブへ繋ぐ。）
+    """
+    from . import reminders
+
+    now_arg = args.get("now")
+    now_min = rhythm.to_minutes(now_arg) if now_arg else None
+    if now_min is None:
+        now_min = _now_min()
+
+    today = _today()
+    records = [dict(r) for r in conn.execute(
+        "SELECT * FROM social_rhythm ORDER BY date").fetchall()]
+    typical_wake = reminders.typical_anchor_min(records, "wake")
+    typical_bed = reminders.typical_anchor_min(records, "bed")
+
+    has_checkin = conn.execute(
+        "SELECT 1 FROM checkins WHERE date=? LIMIT 1", (today,)).fetchone() is not None
+    reserved_row = conn.execute(
+        "SELECT step FROM first_steps WHERE date=? AND consumed=0", (today,)).fetchone()
+    reserved_step = reserved_row["step"] if reserved_row else None
+    day_closed = conn.execute(
+        "SELECT 1 FROM day_closes WHERE date=? LIMIT 1", (today,)).fetchone() is not None
+
+    checkins = [dict(r) for r in conn.execute(
+        "SELECT * FROM checkins ORDER BY date, ts").fetchall()]
+    signs = [dict(r) for r in conn.execute("SELECT * FROM warning_signs").fetchall()]
+    for s in signs:
+        try:
+            s["actions"] = json.loads(s.get("actions") or "[]")
+        except (ValueError, TypeError):
+            s["actions"] = []
+    early = signals.detect(checkins, signs)
+
+    latest = conn.execute(
+        "SELECT mood, sleep_hours FROM checkins ORDER BY date DESC, ts DESC LIMIT 1").fetchone()
+    accel = bool(latest and latest["mood"] is not None and latest["mood"] >= config.NIGHT_ACCEL_MOOD
+                 and latest["sleep_hours"] is not None and latest["sleep_hours"] < config.SHORT_SLEEP_HOURS)
+
+    nudges = reminders.due_nudges(
+        now_min=now_min,
+        typical_wake_min=typical_wake,
+        typical_bed_min=typical_bed,
+        has_checkin_today=has_checkin,
+        reserved_step=reserved_step,
+        day_closed=day_closed,
+        early_notices=early,
+        acceleration=accel,
+    )
+
+    if not nudges:
+        return _ok(
+            "いまは特にお知らせはありません。必要になったら、こちらからそっと声をかけます。\n"
+            + safety.DISCLAIMER,
+            nudges=[], now=_min_to_hm(now_min),
+            typical_wake=_min_to_hm(typical_wake), typical_bed=_min_to_hm(typical_bed),
+        )
+
+    lines = ["いま、そっとお伝えできることが少しあります（任意・無視してOK）：", ""]
+    for n in nudges:
+        lines.append(f"・{n['text']}")
+    lines.append("")
+    lines.append("これは最小限の声かけです。今のあなたに合わなければ、全部スルーして大丈夫。"
+                 "ストリークも、できなかった日数も数えていません。")
+    lines.append(safety.DISCLAIMER)
+    return _ok("\n".join(lines), nudges=nudges, now=_min_to_hm(now_min),
+               typical_wake=_min_to_hm(typical_wake), typical_bed=_min_to_hm(typical_bed))
+
+
 # ====== 事業所向けモード（20〜23） ======
 
 def _sanitize_filename(name: str) -> str:
@@ -972,6 +1058,7 @@ HANDLERS = {
     "low_battery_mode": low_battery_mode,
     "money_fog": money_fog,
     "choose_support_mode": choose_support_mode,
+    "list_due_reminders": list_due_reminders,
     # 事業所向けモード
     "support_plan_intake": support_plan_intake,
     "support_plan_list": support_plan_list,
@@ -1134,6 +1221,15 @@ TOOL_SPECS = {
         {
             "text": {"type": "string", "description": "いま困っていること・相談文"},
         }, ["text"]),
+    "list_due_reminders": _str(
+        "軽い声かけ（リマインド）。今の時刻と『いつもの起床・就寝アンカー』をもとに、"
+        "朝の30秒チェックイン・予約済みの最初の一歩・夜の着地(start_wind_down)を“今あてはまる分だけ”差し出す。"
+        "早期警告の気づきは1件に集約。ストリークや未達日数は数えず、すべて任意。"
+        "希死念慮など本物の危機はここでは扱わず route_to_crisis_support を最優先にする。"
+        "セッション開始時や『何かある？』に応えるとき、定時のチェックに使う。",
+        {
+            "now": {"type": "string", "description": "現在時刻 HH:MM（省略時は実時刻。テスト・任意）"},
+        }),
     # --- 事業所向けモード ---
     "support_plan_intake": _str(
         "【事業所向け】個別支援計画のアセスメント情報を登録し、起草骨子とClaudeへの起草指示を返す。"

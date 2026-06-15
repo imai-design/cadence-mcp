@@ -31,7 +31,7 @@ class AiApiTest(unittest.TestCase):
         mcp = api.dispatch_api(self.conn, "GET", "/v1/tools", query={"format": ["mcp"]})
         openai = api.dispatch_api(self.conn, "GET", "/v1/tools", query={"format": ["openai"]})
         anthropic = api.dispatch_api(self.conn, "GET", "/v1/tools", query={"format": ["anthropic"]})
-        self.assertEqual(len(mcp["tools"]), 23)
+        self.assertEqual(len(mcp["tools"]), 24)
         self.assertEqual(openai["tools"][0]["type"], "function")
         self.assertIn("input_schema", anthropic["tools"][0])
 
@@ -61,7 +61,7 @@ class AiApiTest(unittest.TestCase):
             "id": 1,
             "method": "tools/list",
         })
-        self.assertEqual(len(out["result"]["tools"]), 23)
+        self.assertEqual(len(out["result"]["tools"]), 24)
 
     def test_new_app_tools_are_exposed_to_other_ai(self):
         out = api.dispatch_api(self.conn, "GET", "/v1/tools", query={"format": ["openai"]})

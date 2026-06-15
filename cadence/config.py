@@ -93,6 +93,13 @@ LONG_SLEEP_STREAK = 3
 MOOD_SWING_DELTA = 4             # 直近数日の気分変動幅がこれ以上で「揺れ」に気づく
 EARLY_WARNING_LOOKBACK_DAYS = 7
 
+# === リマインド（軽い声かけ）===
+# 通知は最小限・任意・責めない。ストリークや未達日数は数えない。
+# 朝は起床アンカーから一定時間以内に、夜は就寝アンカーの一定時間手前にだけ差し出す。
+REMINDER_MORNING_WINDOW_MIN = 180   # 起床からこの分数以内なら「朝の声かけ」を出してよい
+REMINDER_EVENING_WINDOW_MIN = 90    # 就寝のこの分数手前から「夜の着地」を出してよい
+REMINDER_TYPICAL_WINDOW_DAYS = 14   # 「いつもの時刻」を求めるためにさかのぼる日数
+
 # === if-then プラン（実行意図）===
 MAX_ACTIVE_IF_THEN = 2           # 同時に持つのは1〜2個まで（絞るほど効く）
 
